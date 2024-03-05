@@ -2,7 +2,7 @@
 
 ## Introduction
 
-The hsbot-backend is a docker-based application for Gufu-hsbot(link), it provides the information services and information filt.
+The hsbot-backend is a docker-based application for [Gufu-hsbot](https://github.com/SolaMeow/hsbot-Gufu), it provides the information services and information filt.
 
 It contains 3 component:
 
