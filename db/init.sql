@@ -13,5 +13,6 @@ CREATE TABLE IF NOT EXISTS Ranking (
     player_id INT,
     `rank` INT,
     timestamp DATETIME,
+    batch INT,
     FOREIGN KEY (player_id) REFERENCES Player(id)
 );

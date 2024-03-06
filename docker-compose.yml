@@ -1,0 +1,22 @@
+version: '3'
+services:
+  crawl:
+    container_name: mycrawl
+    build: ./crawl
+    depends_on:
+      - db
+    environment:
+      - DATABASE_HOST=db
+      - DATABASE_PORT=3306
+    restart: always  # 添加这一行
+  db:
+    container_name: mymysql
+    build: ./db
+    command: --default-authentication-plugin=mysql_native_password  # 添加这一行
+    restart: always  # 添加这一行
+    environment:
+      MYSQL_ROOT_PASSWORD: HsbotDb  # 修改密码为HsbotDb
+    # volumes:
+    #   - ./db/db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"

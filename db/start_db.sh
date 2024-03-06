@@ -5,7 +5,7 @@ docker-compose up -d
 
 # 等待MySQL服务启动
 echo "Waiting for MySQL to start..."
-sleep 20
+sleep 30
 
 # 创建数据库表
 echo "Creating tables..."

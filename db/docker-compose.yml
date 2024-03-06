@@ -4,7 +4,7 @@ services:
   db:
     container_name: mymysql
     image: mysql:latest
-    command: --default-authentication-plugin=caching_sha2_password
+    command: --default-authentication-plugin=mysql_native_password
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: HsbotDb  # 修改密码为HsbotDb
