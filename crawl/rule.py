@@ -58,7 +58,13 @@ def job():
     try:
         cursor.execute("SELECT COUNT(*) FROM Ranking")
         count_after_delete = cursor.fetchone()[0]
-        logging.info(f"Deleted {count - count_after_delete} data")
+        delta = count - count_after_delete
+        if delta > 0:
+            logging.info(f"Deleted {delta} data")
+        elif delta < 0:
+            logging.info(f"Increased {-delta} data")
+        else:
+            logging.info("No data change")
     except mysql.connector.Error as err:
         logging.error(f"Error: {err}")
 
