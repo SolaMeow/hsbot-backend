@@ -19,19 +19,20 @@ logging.basicConfig(handlers=[handler], level=logging.INFO, format='%(asctime)s 
 
 # 获取IP地址和端口
 port = 3306
-# 连接到数据库
-db = mysql.connector.connect(
-    host="db",
-    port=port,
-    user="root",
-    password="HsbotDb",
-    database="mydb"
-)
-
-# 创建一个游标对象
-cursor = db.cursor()
 
 def job():
+    # 连接到数据库
+    db = mysql.connector.connect(
+        host="db",
+        port=port,
+        user="root",
+        password="HsbotDb",
+        database="mydb"
+    )
+
+    # 创建一个游标对象
+    cursor = db.cursor()
+
     # 爬取数据
     try:
         asyncio.run(crawl.crawl_data())
@@ -68,10 +69,14 @@ def job():
     except mysql.connector.Error as err:
         logging.error(f"Error: {err}")
 
-# 每小时执行一次任务
+    # 关闭数据库连接和游标
+    cursor.close()
+    db.close()
+
+
 while True:
-    time.sleep(60)  # 等待数据库启动
+    time.sleep(100)  # 等待数据库启动
     job()
     logging.info("Job done")
-    time.sleep(1200)  # 暂停1200秒
+    time.sleep(1100)  # 暂停1200秒
     
