@@ -1,4 +1,5 @@
 import mysql.connector
+from datetime import datetime
 
 # 获取IP地址和端口
 ip_address = "localhost"
@@ -50,6 +51,26 @@ print(f"\nPlayer table has {num_rows} rows")
 cursor.execute("SELECT COUNT(*) FROM Ranking")
 num_rows = cursor.fetchone()[0]
 print(f"\nRanking table has {num_rows} rows")
+
+# 查询每个batch的数量和timestamp平均时间
+cursor.execute("""
+    SELECT batch, COUNT(*), AVG(TIMESTAMPDIFF(SECOND, '1970-01-01 00:00:00', timestamp)) as avg_timestamp
+    FROM Ranking
+    GROUP BY batch
+""")
+print("\nBatch counts and average timestamps:")
+for row in cursor:
+    batch = row[0]
+    count = row[1]
+    avg_timestamp = row[2]
+
+    # 将时间戳转换为datetime对象
+    avg_date = datetime.fromtimestamp(avg_timestamp)
+
+    # 将datetime对象格式化为yyyymmdd:mm:ss
+    avg_date_str = avg_date.strftime('%Y%m%d:%H:%M:%S')
+
+    print(batch, count, avg_date_str)
 
 # 关闭连接
 cursor.close()
