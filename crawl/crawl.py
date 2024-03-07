@@ -35,6 +35,8 @@ async def fetch_page(session, url, headers):
         return page_results
 
 
+BATCH_SIZE = 5000  # 每批数据的大小
+
 async def reqRankLev(region: str, leaderboardId: str, new_batch: int):
     all_results = []
     test_url = f"https://hearthstone.blizzard.com/en-us/api/community/leaderboardsData?region={region}&leaderboardId={leaderboardId}&page=1"
@@ -54,39 +56,44 @@ async def reqRankLev(region: str, leaderboardId: str, new_batch: int):
     
     # size of all_results
     logger.info(f"size of all_results: {len(all_results)}")
-    # 获取IP地址和端口
-    port = 3306
-    # 连接到数据库
-    db = mysql.connector.connect(
-        host="db",
-        port=port,
-        user="root",
-        password="HsbotDb",
-        database="mydb"
-    )
 
-    # 创建一个游标对象
-    cursor = db.cursor()
+    # 将数据分成多个批次
+    batches = [all_results[i:i + BATCH_SIZE] for i in range(0, len(all_results), BATCH_SIZE)]
 
-    # 将数据插入数据库
-    for rank, name in all_results:
-        cursor.execute(
-            "INSERT INTO Player (name, region, mode) VALUES (%s, %s, %s)",
-            (name, region, leaderboardId)
-        )
-        player_id = cursor.lastrowid
-        now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # 获取当前的日期和时间
-        cursor.execute(
-            "INSERT INTO Ranking (player_id, `rank`, timestamp, batch) VALUES (%s, %s, %s, %s)",
-            (player_id, rank, now, new_batch)
+    for batch in batches:
+        # 获取IP地址和端口
+        port = 3306
+        # 连接到数据库
+        db = mysql.connector.connect(
+            host="db",
+            port=port,
+            user="root",
+            password="HsbotDb",
+            database="mydb"
         )
 
-    # 提交事务
-    db.commit()
+        # 创建一个游标对象
+        cursor = db.cursor()
 
-    # 关闭连接
-    cursor.close()
-    db.close()
+        # 将数据插入数据库
+        for rank, name in batch:
+            cursor.execute(
+                "INSERT INTO Player (name, region, mode) VALUES (%s, %s, %s)",
+                (name, region, leaderboardId)
+            )
+            player_id = cursor.lastrowid
+            now = datetime.now().strftime('%Y-%m-%d %H:%M:%S')  # 获取当前的日期和时间
+            cursor.execute(
+                "INSERT INTO Ranking (player_id, `rank`, timestamp, batch) VALUES (%s, %s, %s, %s)",
+                (player_id, rank, now, new_batch)
+            )
+
+        # 提交事务
+        db.commit()
+
+        # 关闭连接
+        cursor.close()
+        db.close()
 
 async def crawl_data():
     # 获取IP地址和端口
