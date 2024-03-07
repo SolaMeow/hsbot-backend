@@ -51,6 +51,7 @@ def job():
     six_hours_ago = datetime.now() - timedelta(hours=6)
     try:
         cursor.execute("DELETE FROM Ranking WHERE timestamp < %s", (six_hours_ago,))
+        cursor.execute("DELETE FROM Player WHERE id NOT IN (SELECT player_id FROM Ranking)")
         db.commit()
     except mysql.connector.Error as err:
         logging.error(f"Error: {err}")
